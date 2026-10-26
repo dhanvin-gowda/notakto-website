@@ -26,7 +26,11 @@ interface MatchAction {
 }
 
 export function useLocalMatchController() {
-	const [boards, setBoards] = useState<BoardState[]>([]);
+	const [boards, setBoards] = useState<BoardState[]>(() =>
+		Array(3)
+			.fill(null)
+			.map(() => Array(9).fill("")),
+	);
 	const [boardSize, setBoardSize] = useState<BoardSize>(3);
 	const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1);
 	const [player1Name, setPlayer1Name] = useState("Player 1");
@@ -48,15 +52,18 @@ export function useLocalMatchController() {
 
 	useEffect(() => {
 		openModal("names");
-	}, [openModal]);
+		return () => {
+			closeModal();
+		};
+	}, [openModal, closeModal]);
 
 	useEffect(() => {
-		if (!gameStarted) return;
+		if (!gameStarted || !!winner) return;
 		const interval = setInterval(() => {
 			setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
 		}, 1000);
 		return () => clearInterval(interval);
-	}, [gameStarted]);
+	}, [gameStarted, winner]);
 
 	useShortcut(
 		{
@@ -101,11 +108,13 @@ export function useLocalMatchController() {
 	);
 
 	const makeMove = (boardIndex: number, cellIndex: number) => {
+		if (winner || activeModal === "winner") return;
 		setShowPreview(false);
 		if (!hasMoveHappened) {
 			setHasMoveHappened(true);
 		}
 		if (
+			!boards[boardIndex] ||
 			boards[boardIndex][cellIndex] !== "" ||
 			isBoardDead(boards[boardIndex], boardSize)
 		) {
@@ -251,6 +260,7 @@ export function useLocalMatchController() {
 			closeModal();
 		},
 		confirmExit: () => {
+			closeModal();
 			router.push("/");
 		},
 	};
