@@ -183,4 +183,33 @@ describe("VsPlayerGameScreen Inactivity Modal Behavior & Edge Cases", () => {
 		const modals = screen.getAllByText("Are You Still Playing?");
 		expect(modals).toHaveLength(1);
 	});
+
+	it("pauses the match timer while the inactivity pause modal is shown and resumes accurately", () => {
+		startGame();
+
+		act(() => {
+			vi.advanceTimersByTime(300000);
+		});
+		expect(screen.getByText("Are You Still Playing?")).toBeInTheDocument();
+		expect(screen.getAllByText("5:00").length).toBeGreaterThan(0);
+
+		act(() => {
+			vi.advanceTimersByTime(120000);
+		});
+		expect(screen.getAllByText("5:00").length).toBeGreaterThan(0);
+
+		const continueBtn = screen.getByRole("button", {
+			name: "Continue Playing",
+		});
+		fireEvent.click(continueBtn);
+
+		expect(
+			screen.queryByText("Are You Still Playing?"),
+		).not.toBeInTheDocument();
+
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(screen.getAllByText("5:05").length).toBeGreaterThan(0);
+	});
 });

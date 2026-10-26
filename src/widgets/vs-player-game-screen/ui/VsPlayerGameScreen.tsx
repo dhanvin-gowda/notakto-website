@@ -14,9 +14,9 @@ import PlayerNamesModal from "@/widgets/player-names-modal/ui/PlayerNamesModal";
 import WinnerModal from "@/widgets/winner-modal/ui/WinnerModal";
 
 export default function VsPlayerGameScreen() {
-	const match = useLocalMatchController();
-	const router = useRouter();
 	const [inactivityModalOpen, setInactivityModalOpen] = useState(false);
+	const match = useLocalMatchController({ isPaused: inactivityModalOpen });
+	const router = useRouter();
 
 	const isGameRunning =
 		match.initialSetupDone &&
