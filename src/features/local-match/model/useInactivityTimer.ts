@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-export const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000;
+export const INACTIVITY_TIMEOUT_MS = 5 * 1000;
 
 interface UseInactivityTimerOptions {
 	enabled: boolean;
